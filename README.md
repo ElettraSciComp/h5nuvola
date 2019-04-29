@@ -9,7 +9,6 @@ HDFView in the cloud.
 # Features
 ## HDFView in the cloud
 
-
 ![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/screenshots/h5nuvola-screenshot-1.png)
 
 ## Web interface
