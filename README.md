@@ -23,6 +23,8 @@ Click on the link below to see a Jupyter Notebook live demo:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/carlosesreis/h5nuvola-notebook-demo/master?urlpath=%2Fapps%2Fh5nuvola.ipynb)
 
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/h5nuvola-notebook-demo.gif)
+
 # Dependencies
 * Python 2.7
   * Flask
