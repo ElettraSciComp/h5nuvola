@@ -17,13 +17,22 @@ HDFView in the cloud.
 ## Facility Portal integration
 ![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/screenshots/h5nuvola-screenshot-3.png)
 
+## GIF demo
+
+### Web portal
+
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-web-demo-1.gif)
+
+### Pythonic data export
+
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-web-demo-2.gif)
 
 # Jupyter Notebook demo
 Click on the link below to see a Jupyter Notebook live demo:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/carlosesreis/h5nuvola-notebook-demo/master?urlpath=%2Fapps%2Fh5nuvola.ipynb)
 
-![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/h5nuvola-notebook-demo.gif)
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-notebook-demo.gif)
 
 # Dependencies
 * Python 2.7
