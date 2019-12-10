@@ -21,7 +21,7 @@ HDFView in the cloud.
 
 ### Web portal
 
-![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-vuo-web-demo-1.gif)
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-vuo-web-demo.gif)
 
 ### Pythonic data export (REST API)
 
