@@ -21,13 +21,13 @@ HDFView in the cloud.
 
 ### Web portal
 
-![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-web-demo-1.gif)
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-vuo-web-demo-1.gif)
 
-### Pythonic data export
+### Pythonic data export (REST API)
 
-![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-web-demo-2.gif)
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-python-api-demo.gif)
 
-# Jupyter Notebook demo
+# Jupyter Notebook GUI demo
 Click on the link below to see a Jupyter Notebook live demo:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/carlosesreis/h5nuvola-notebook-demo/master?urlpath=%2Fapps%2Fh5nuvola.ipynb)
