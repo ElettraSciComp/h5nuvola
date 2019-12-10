@@ -12,10 +12,10 @@ HDFView in the cloud.
 ![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/screenshots/h5nuvola-screenshot-1.png)
 
 ## Web interface
-![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/screenshots/h5nuvola-screenshot-2.png)
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/screenshots/h5nuvola-screenshot-4.png)
 
 ## Facility Portal integration
-![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/screenshots/h5nuvola-screenshot-3.png)
+![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/screenshots/h5nuvola-screenshot-5.png)
 
 ## GIF demo
 
