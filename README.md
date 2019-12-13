@@ -35,7 +35,7 @@ Click on the link below to see a Jupyter Notebook live demo:
 ![alt text](https://github.com/ElettraSciComp/h5nuvola/blob/master/gif/h5nuvola-notebook-demo.gif)
 
 # Dependencies
-* Python 2.7
+* Python 2.7s
   * Flask
   * h5py
   * Numpy

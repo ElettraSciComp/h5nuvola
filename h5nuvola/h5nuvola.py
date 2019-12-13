@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""H5 Nuvola - v02 - VUO integration 
+"""H5 Nuvola - VUO integration 
 versions:
 h5py = 2.7.1
 numpy = 1.13.0
