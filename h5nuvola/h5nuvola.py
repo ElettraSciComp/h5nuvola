@@ -45,6 +45,11 @@ from bokeh.core.properties import Dict
 # Global variables 
 #
 
+# VUO lab
+with open('/opt/vuo-h5nuvola/h5nuvola/h5nuvola/h5nuvola.config') as json_config:
+    config_dict = json.load(json_config)
+vlab_hash = str(config_dict.get("vlab_hash")) 
+
 # jQuery File Tree 
 fnfilter = lambda fn: True
 dfilter = lambda d: True
@@ -468,8 +473,7 @@ def get_vuo_user(cookie):
                         }
     return response_dic
 
-def vlab_call(vuo_user_id, investigation_id ):
-    vlab_hash = 'PQSd3UawkOs4ewDEhWfI1txmSP7bYOxg6AY8aG'
+def vlab_call(vuo_user_id, investigation_id ):    
     vlab_hash_digested = hashlib.sha1(vlab_hash + vuo_user_id + investigation_id).hexdigest()
     vlab_function = 'https://vuo.elettra.eu/pls/vuo/vlab.sm_get_investigation_info'
 
