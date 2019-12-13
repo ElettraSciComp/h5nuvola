@@ -45,10 +45,18 @@ from bokeh.core.properties import Dict
 # Global variables 
 #
 
-# VUO lab
+# Load config file
 with open('/opt/vuo-h5nuvola/h5nuvola/h5nuvola/h5nuvola.config') as json_config:
     config_dict = json.load(json_config)
-vlab_hash = str(config_dict.get("vlab_hash")) 
+
+# VUO lab
+vlab_hash = str(config_dict.get("vlab_hash"))
+
+# https connection certificates
+locations_crt = str(config_dict.get("locations_crt"))
+users_nuvola_crt = str(config_dict.get("users_nuvola_crt"))
+users_nuvola_key = str(config_dict.get("users_nuvola_key"))
+
 
 # jQuery File Tree 
 fnfilter = lambda fn: True
@@ -846,8 +854,8 @@ def h5data(filepath):
 
 context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
 # context.verify_mode = ssl.CERT_REQUIRED
-context.load_verify_locations("/root/certs/DigiCertCA.crt")
-context.load_cert_chain("/root/certs/users-nuvola.elettra.eu.crt", "/root/certs/users-nuvola.elettra.eu.key")
+context.load_verify_locations(locations_crt)
+context.load_cert_chain(users_nuvola_crt, users_nuvola_key)
 # sslcontext = ("/root/certs/users-nuvola.elettra.eu.crt", "/root/certs/users-nuvola.elettra.eu.key")
 
 
