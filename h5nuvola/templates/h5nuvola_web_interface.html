@@ -1,0 +1,964 @@
+<html>
+
+<head>
+    <title>h5nuvola</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite;
+            /* Safari */
+            animation: spin 2s linear infinite;
+        }
+
+        /* Safari */
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .ui-resizable {
+            position: absolute !important;
+        }
+    </style>
+
+    <!-- Load W3 CSS framework and font awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='js-css/w3css/w3.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="{{ url_for('static', filename='js-css/w3codecolor/w3codecolor.js') }}" type="text/javascript"></script>
+    <!-- Load jQuery, jQueryui, jQuery BlockUI plugin-->
+    <script src="{{ url_for('static', filename='js-css/jQuery/jquery-2.2.4.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js-css/jQuery/jquery.blockUI.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js-css/jQuery/jquery-ui.js') }}" type="text/javascript"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='js-css/jQuery/jquery-ui.css') }}">
+    <!-- Load jquery FileTree plugin -->
+    <script src="{{ url_for('static', filename='js-css/jquery.fileTree-1.01/jquery.easing.js') }}"
+        type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js-css/jquery.fileTree-1.01/jqueryFileTree.js') }}"
+        type="text/javascript"></script>
+    <link href="{{ url_for('static', filename='js-css/jquery.fileTree-1.01/jqueryFileTree.css') }}" rel="stylesheet"
+        type="text/css" media="screen" />
+    <!-- include jsTree | css theme and source -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='js-css/jsTree/style.min.css') }}">
+    <script src="{{ url_for('static', filename='js-css/jsTree/jstree.min.js') }}"></script>
+    <!-- load Bokeh CSS stylesheets -->
+    <link href="{{ url_for('static', filename='js-css/bokeh/bokeh-1.2.0.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='js-css/bokeh/bokeh-widgets-1.2.0.css') }}" rel="stylesheet"
+        type="text/css">
+    <link href="{{ url_for('static', filename='js-css/bokeh/bokeh-tables-1.2.0.css') }}" rel="stylesheet"
+        type="text/css">
+    <!-- include Bokeh js source -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js-css/bokeh/bokeh-1.2.0.js') }}"></script>
+    <script type="text/javascript"
+        src="{{ url_for('static', filename='js-css/bokeh/bokeh-widgets-1.2.0.js') }}"></script>
+    <script type="text/javascript"
+        src="{{ url_for('static', filename='js-css/bokeh/bokeh-tables-1.2.0.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js-css/bokeh/bokeh-api-1.2.0.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js-css/bokeh/bokeh-gl-1.2.0.js') }}"></script>
+</head>
+
+<body>
+
+    <!-- File Browser side bar menu -->
+    <div class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-mobile" style="display:none;" id="fileTreeSidebar">
+        <div class="w3-bar-item w3-large w3-blue" style="position: sticky; top: 0;">
+            <button class="w3-button w3-large w3-mobile w3-blue w3-hover-black" onclick="hideFileTree()">Close
+                &times;</button>
+            <button class="w3-button w3-large w3-mobile w3-blue w3-hover-black" onclick="showH5Files()">&#9776; h5
+                Files</button>
+        </div>
+        <div class="w3-bar-item w3-container w3-xxlarge" id="fileTree">Remote Storage</div>
+    </div>
+    <!-- H5 File viewer side bar menu - tree sctructure, attributes, plotting options -->
+    <div class="w3-sidebar w3-bar-block w3-card w3-animate-left w3-mobile" style="display:none;" id="H5FilesSidebar">
+        <div class="w3-bar-item w3-large w3-blue" style="position: sticky; top: 0;">
+            <button class="w3-button w3-large w3-mobile w3-blue w3-hover-black" style="display:inline;"
+                onclick="hideH5Files()">Close &times;</button>
+            <button class="w3-button w3-large w3-mobile w3-blue w3-hover-black" style="display:inline;"
+                onclick="showFileTree()">&#9776; File Browser</button>
+        </div>
+        <div class="w3-bar-item w3-container w3-medium" id="h5Tree"></div>
+        <div class="w3-bar-item w3-card w3-blue" style="position: sticky; bottom: 1;">
+            <div class="w3-container">
+                <ul id="hf_attributes" style="list-style: none;">Attributes:</ul>
+                <button class="w3-button" id="close_file_button" style="display:none;">Close File</button>
+                <button class="w3-button" id="raw_button" style="display:none;">Raw</button>
+                <button class="w3-button" id="curve_button" style="display:none;">Curve</button>
+                <button class="w3-button" id="image_button" style="display:none;">Image</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="w3-mobile" id="main">
+        <!-- About card -->
+        <div class="w3-card-4 w3-white" id="about">
+            <span onclick="hideAbout()" class="w3-button w3-black w3-large w3-display-topright">x</span>
+
+            <header class="w3-container w3-blue">
+                <h1>h5nuvola</h1>
+            </header>
+
+            <div class="w3-container">
+                <img src="{{ url_for('static', filename='h5nuvola_logo/elettra_logo_311x64px_100dpi.png') }}"
+                    alt=""><br><br>
+                <img src="{{ url_for('static', filename='h5nuvola_logo/ceric_logo_212x51_px_100dpi.png') }}" alt="">
+
+            </div>
+
+            <footer class="w3-container w3-blue">
+                <img class="w3-padding"
+                    src="{{ url_for('static', filename='h5nuvola_logo/black_h5nuvola_logo_46x40px_100dpi.png') }}"
+                    alt="">
+            </footer>
+        </div>
+
+        <!-- Logo, user options, app settings -->
+        <div class="w3-container"  id="logoUser">
+            <img class="" src="{{ url_for('static', filename='h5nuvola_logo/h5nuvola_logo_91_80px_30dpi.png') }}"
+                alt="h5nuvola logo">
+            <div class="w3-padding w3-dropdown-hover w3-xlarge">
+                <button class="w3-button w3-hover-black fa fa-user-o" id="userName"></button>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                    <button class="w3-bar-item w3-button" id="logout_button">Logout</button>
+                </div>
+            </div>
+            <button id="settings" class="w3-padding w3-button w3-xlarge w3-hover-black fa fa-cog"></button>
+        </div>
+        <!-- Main action buttons bar -->
+        <div class="w3-blue" id="mainButtons">
+            <!-- nav icon = &#9776; -->
+            <button id="showFileTree" class="fa fa-navicon w3-button w3-xlarge w3-hover-black" onclick="showFileTree()">
+                File Browser</button>
+            <button id="showH5Files" class="w3-button w3-xlarge w3-hover-black fa fa-navicon" onclick="showH5Files()">
+                h5 Files</button>
+            <button id="showPythonApi" class="w3-button w3-xlarge w3-hover-black fa fa-code" onclick="showPythonApi()">
+                Python API</button>
+            <div class="w3-dropdown-hover w3-xlarge">
+                <button class="w3-button w3-hover-black fa fa-question-circle"></button>
+                <div class="w3-dropdown-content w3-bar-block w3-card-4">
+                    <button class="w3-bar-item w3-button" id="about_button">About</button>
+                    <a href="#" class="w3-bar-item w3-button">Support</a>
+                    <!-- <a href="#" class="w3-bar-item w3-button">Link 3</a> -->
+                </div>
+            </div>
+        </div>
+        <!-- Tabs buttons bar -->
+        <div class="w3-bar w3-black" id="mainTabs" style="border: 1px solid black;">
+            <button id="tab-button-001" class="w3-bar-item w3-button tablink w3-red" onclick="openTab('001')">Python
+                API</button>
+        </div>
+        <!-- Tabs contents div -->
+        <div class="w3-container" id="tabsContent">
+            <div id="tab-content-001" class="w3-container w3-display-container tab">
+                <span onclick="hidePythonApi()" class="w3-button w3-large w3-display-topright fa fa-close"></span>
+                <h3 class="w3-text-red">Python API</h3>
+                <p>Export the selected dataset to your Python program as a NumPy array:</p>
+
+                <div class="w3-panel w3-card w3-light-grey">
+                    <h3>Define the Python method:</h3>
+                    <pre class="w3-code pythonHigh notranslate "> <code>
+import os
+import requests
+import numpy as np
+
+def geth5data( h5nuvolaurl, vuotoken, h5path, dsetname, slicing='[:]' ):
+    params = {'vuotoken': vuotoken, 'ext':os.path.splitext(h5path)[-1]}            
+    r = requests.post( h5nuvolaurl + h5path + dsetname + slicing, data=params, stream=True )
+    try:
+        dshape = eval(r.headers['shape'])
+        dtype = r.headers['dtype']
+        d = np.frombuffer(r.content,dtype=dtype).reshape( dshape )
+        return d
+    except:
+        return r.text
+            </code></pre>
+                </div>
+
+                <div class="w3-panel w3-card w3-light-grey">
+                    <h3>Call the method as the example:</h3>
+                    <div class="w3-code notranslate ">
+
+                        d = geth5data( h5nuvolaurl='https://users-nuvola.elettra.eu/h5data',<br>
+                        vuotoken='<span id="vuocookie"></span>',<br>
+                        h5path='<span id="h5path"></span>',<br>
+                        dsetname='<span id="dsetname"></span>',<br>
+                        slicing='[:]' )
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main JavaScript code -->
+    <script type="text/javascript">
+        // HTML elements variables
+        var divMain = document.getElementById("main");
+        var divMainButtons = document.getElementById("mainButtons");
+        var divMainTabs = document.getElementById("mainTabs");
+        var tabsContent = document.getElementById("tabsContent");
+        var buttonShowFileTree = document.getElementById("showFileTree");
+        var fileTreeSidebar = document.getElementById("fileTreeSidebar");
+        var buttonShowH5Files = document.getElementById("showH5Files");
+        var H5FilesSidebar = document.getElementById("H5FilesSidebar");
+        var logoUserDiv = document.getElementById("logoUser");
+
+        var aboutCard = document.getElementById("about");
+
+        var close_file_button = document.getElementById("close_file_button");
+        var raw_button = document.getElementById("raw_button");
+        var curve_button = document.getElementById("curve_button");
+        var image_button = document.getElementById("image_button");
+
+        var h5pathSpan = document.getElementById("h5path");
+        var vuoCookieSpan = document.getElementById("vuocookie");
+        var dsetnameSpan = document.getElementById("dsetname");
+
+        var pythonApiTabContent = document.getElementById("tab-content-001");
+        var pythonApiTabButton = document.getElementById("tab-button-001");
+
+        // Global variables
+        var unixUserName = {{ UNIX_USER_NAME| safe }}; // unix user name
+        var userName = {{ H5NUVOLA_USER_NAME| safe }}; // h5nuvola user name
+        var rootDir = {{ BASE_DIR| safe }}; // root directory to browse
+        var investigationID = {{ INVESTIGATION_ID| safe }};
+        var cookies = document.cookie; // get cookies from document (includes vuo_session)
+
+        var hfDict = {}; // hf new items to be added to the tree
+        var node_clicked = ''; // current node clicked
+
+        w3CodeColor();
+
+        // when opened in mobile more cookies appears, needs to 'sanitize' for the 'vuo_session'
+        function sanitizeCookie(cookies) {
+            var vuoCookie = ''
+            if (cookies.includes(';')) { // more than one cookie
+
+                cookies = cookies.split(';');
+                for (var i in cookies) {
+                    if (cookies[i].includes("vuo_session")) {
+                        vuoCookie = cookies[i].trim().split('=')[1];
+                        return vuoCookie
+                    }
+                }
+            } else {
+                vuoCookie = cookies.split('=')[1];
+                return vuoCookie
+            }
+        }
+
+        function hideAbout() {
+            $.unblockUI();
+        }
+
+        function showFileTree() {
+            if (H5FilesSidebar.style.display == "none") {
+                fileTreeSidebar.style.width = window.innerWidth / 2;
+                logoUserDiv.style.marginLeft = window.innerWidth / 2;
+                mainTabs.style.marginLeft = window.innerWidth / 2;
+                tabsContent.style.marginLeft = window.innerWidth / 2;
+
+            } else {
+                fileTreeSidebar.style.width = window.innerWidth / 4;
+                H5FilesSidebar.style.marginLeft = window.innerWidth / 4;
+                H5FilesSidebar.style.width = window.innerWidth / 4;
+                logoUserDiv.style.marginLeft = window.innerWidth / 2;
+                mainTabs.style.marginLeft = window.innerWidth / 2;
+                tabsContent.style.marginLeft = window.innerWidth / 2;
+            }
+            // if (H5FilesSidebar.style.display == "none") {
+            //     buttonShowH5Files.style.marginLeft = "25%";
+            //     divMainTabs.style.marginLeft = "25%";
+            //     tabsContent.style.marginLeft = "25%";
+            //     fileTreeSidebar.style.width = "50%";
+            // } else {
+            //     divMainTabs.style.marginLeft = "50%";
+            //     tabsContent.style.marginLeft = "50%";
+            //     H5FilesSidebar.style.marginLeft = "25%";       
+            //     H5FilesSidebar.style.width = "25%";
+            //     fileTreeSidebar.style.width = "25%";            
+            // }                
+
+            fileTreeSidebar.style.display = "block";
+            // buttonShowFileTree.style.display = "none";
+
+        }
+
+        function hideFileTree() {
+            if (H5FilesSidebar.style.display == "none") {
+                logoUserDiv.style.marginLeft = "0%";
+                mainTabs.style.marginLeft = "0%";
+                tabsContent.style.marginLeft = "0%";
+            } else {
+                H5FilesSidebar.style.marginLeft = "0%";
+                logoUserDiv.style.marginLeft = H5FilesSidebar.style.width;
+                mainTabs.style.marginLeft = H5FilesSidebar.style.width;
+                tabsContent.style.marginLeft = H5FilesSidebar.style.width;
+            }
+            // if (H5FilesSidebar.style.display == "none") {
+            //     buttonShowH5Files.style.marginLeft = "0%";
+            //     divMainTabs.style.marginLeft = "0%";
+            //     tabsContent.style.marginLeft = "0%";
+            //     H5FilesSidebar.style.width = "25%";
+            //     buttonShowFileTree.style.marginLeft = "0%";
+            // } else {
+            //     divMainButtons.style.marginLeft = "0%";
+            //     divMainTabs.style.marginLeft = "25%";
+            //     tabsContent.style.marginLeft = "25%";
+            //     H5FilesSidebar.style.marginLeft = "0%";
+            //     H5FilesSidebar.style.width = "50%";
+            //     buttonShowFileTree.style.marginLeft = "25%";
+            // }                        
+
+            fileTreeSidebar.style.display = "none";
+            // buttonShowFileTree.style.display = "inline-block";
+        }
+
+        function showH5Files() {
+            if (fileTreeSidebar.style.display == "none") {
+                H5FilesSidebar.style.marginLeft = "0%";
+                H5FilesSidebar.style.width = window.innerWidth / 2;
+                logoUserDiv.style.marginLeft = window.innerWidth / 2;
+                mainTabs.style.marginLeft = window.innerWidth / 2;
+                tabsContent.style.marginLeft = window.innerWidth / 2;
+            } else {
+                fileTreeSidebar.style.marginLeft = "0%";
+                fileTreeSidebar.style.width = window.innerWidth / 4;
+                H5FilesSidebar.style.marginLeft = window.innerWidth / 4;
+                H5FilesSidebar.style.width = window.innerWidth / 4;
+                logoUserDiv.style.marginLeft = window.innerWidth / 2;
+                mainTabs.style.marginLeft = window.innerWidth / 2;
+                tabsContent.style.marginLeft = window.innerWidth / 2;
+            }
+            // if (fileTreeSidebar.style.display == "none") {
+            //     buttonShowFileTree.style.marginLeft = "25%";
+            //     divMainTabs.style.marginLeft = "25%";
+            //     tabsContent.style.marginLeft = "25%";
+            //     H5FilesSidebar.style.marginLeft = "0%";
+            //     H5FilesSidebar.style.width = "50%"           
+            // } else {
+            //     divMainTabs.style.marginLeft = "50%";
+            //     tabsContent.style.marginLeft = "50%";
+            //     H5FilesSidebar.style.marginLeft = "25%";       
+            //     H5FilesSidebar.style.width = "25%";
+            //     fileTreeSidebar.style.width = "25%";
+            // }
+            // H5FilesSidebar.style.width = "30%";       
+            H5FilesSidebar.style.display = "block";
+            // buttonShowH5Files.style.display = "none";
+        }
+
+        function hideH5Files() {
+            if (fileTreeSidebar.style.display == "none") {
+                logoUserDiv.style.marginLeft = "0%";
+                mainTabs.style.marginLeft = "0%";
+                tabsContent.style.marginLeft = "0%";
+            } else {
+                fileTreeSidebar.style.marginLeft = "0%"
+                fileTreeSidebar.style.width = "50%";
+                logoUserDiv.style.marginLeft = window.innerWidth / 2;
+                mainTabs.style.marginLeft = window.innerWidth / 2;
+                tabsContent.style.marginLeft = window.innerWidth / 2;
+            }
+            // if (fileTreeSidebar.style.display == "none") {
+            //     divMainTabs.style.marginLeft = "0%";
+            //     tabsContent.style.marginLeft = "0%";
+            //     buttonShowFileTree.style.marginLeft = "0%";
+            //     buttonShowH5Files.style.marginLeft = "0%";
+            // } else {            
+            //     divMainTabs.style.marginLeft = "25%";
+            //     tabsContent.style.marginLeft = "25%";
+            //     buttonShowH5Files.style.marginLeft = "25%";
+            //     fileTreeSidebar.style.width = "50%";
+            // }
+            // //divMainButtons.style.marginLeft = "0%";
+            H5FilesSidebar.style.display = "none";
+            // buttonShowH5Files.style.display = "inline-block";        
+        }
+
+        function showPythonApi() {
+            console.log("Show Python API");
+            if (pythonApiTabContent.style.display == "none") {
+                // pythonApiTabContent.style.display = "block";
+                pythonApiTabButton.style.display = "block";
+                openTab("001");
+            }
+        }
+
+        function hidePythonApi() {
+            console.log("Hide Python API")
+            pythonApiTabContent.style.display = "none";
+            pythonApiTabButton.style.display = "none";
+        }
+
+        function addTab(tabDetails, tabName) {
+            var tabID = Math.random().toString(36).substring(7);
+
+            // Create new Tab Button
+            var newTabButton = document.createElement("button");
+            newTabButton.setAttribute("id", "tab-button-" + tabID)
+            newTabButton.setAttribute("class", "w3-bar-item w3-button tablink");
+            newTabButton.setAttribute("onclick", "openTab('" + tabID + "')");
+            newTabButton.innerHTML = tabName;
+            divMainTabs.appendChild(newTabButton);
+
+            // Create new Tab Content
+            var newTabDiv = document.createElement("div");
+            newTabDiv.setAttribute("id", "tab-content-" + tabID);
+            newTabDiv.setAttribute("class", "w3-container w3-display-container tab");
+
+            var newTabContent = document.createElement("h2");
+            newTabContent.setAttribute("class", "w3-large");
+            newTabContent.innerHTML = tabDetails + "    ->    " + tabName;
+            newTabDiv.appendChild(newTabContent);
+
+            var newTabPlot = document.createElement("div");
+            newTabPlot.setAttribute("id", "tab-plot-" + tabID);
+            newTabPlot.setAttribute("class", "w3-container w3-display-container");
+            newTabDiv.appendChild(newTabPlot);
+
+            var newTabClose = document.createElement("span");
+            newTabClose.setAttribute("onclick", "removeTab('" + tabID + "')");
+            newTabClose.setAttribute("class", "w3-button w3-large w3-display-topright fa fa-close");
+            newTabDiv.appendChild(newTabClose);
+
+            // Append New Tab Div
+            tabsContent.appendChild(newTabDiv);
+
+            // Show new tab's content
+            openTab(tabID);
+            return tabID;
+        }
+
+        function openTab(tabID) {
+
+            var tabButtonID = "tab-button-" + tabID;
+            var tabContentID = "tab-content-" + tabID;
+
+            var i, tabs, tablinks;
+            var tabs = document.getElementsByClassName("tab");
+            var tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tabs.length; i++) {
+                tabs[i].style.display = "none";
+                tablinks[i].className = tablinks[i].className.replace(" w3-red", "");
+            }
+            document.getElementById(tabButtonID).className += " w3-red";
+            document.getElementById(tabContentID).style.display = "block";
+        }
+
+        function removeTab(tabID) {
+            var tabButtonID = "tab-button-" + tabID;
+            var tabContentID = "tab-content-" + tabID
+            var toRemoveTab = document.getElementById(tabContentID);
+            var toRemoveButton = document.getElementById(tabButtonID);
+            var activeTab = toRemoveButton.previousElementSibling;
+            toRemoveTab.parentNode.removeChild(toRemoveTab);
+            toRemoveButton.parentNode.removeChild(toRemoveButton);
+            openTab(activeTab.id.split("-").pop());
+        }
+
+        function populateH5TreeRoot(hfDict) {
+
+            // create root node
+            var root_id = $('#h5Tree').jstree().create_node('#', {
+                text: hfDict.root_properties[0],
+                icon: "{{ url_for('static', filename='hdf_icons/hdf5.gif') }}",
+                state: {
+                    opened: true,
+                    disabled: false,
+                    selected: false
+                },
+                a_attr: {
+                    "type": "file",
+                    "obj_filepath": hfDict.filepath,
+                    "obj_path": "/",
+                    "obj_attributes": hfDict.root_properties[2],
+                    "obj_dtype": hfDict.root_properties[4],
+                    "obj_dshape": hfDict.root_properties[5]
+                }
+            });
+
+            // ad hf_root_items to root node
+            var icon = '';
+            var type = '';
+            for (var i = 0; i <= hfDict.hf_root_items.length - 1; i++) {
+                if (hfDict.hf_root_items[i][1] == "group") {
+                    if (hfDict.hf_root_items[i][2].length >= 1) {
+                        icon = "{{ url_for('static', filename='hdf_icons/foldercloseA.gif') }}";
+                    } else {
+                        icon = "{{ url_for('static', filename='hdf_icons/folderclose.gif') }}";
+                    }
+                    type = 'group';
+                } else {
+                    if (hfDict.hf_root_items[i][4] == 'string') {
+                        icon = "{{ url_for('static', filename='hdf_icons/text.gif') }}";
+                    } else {
+                        if (hfDict.hf_root_items[i][2].length >= 1) {
+                            icon = "{{ url_for('static', filename='hdf_icons/datasetA.gif') }}";
+                        } else {
+                            icon = "{{ url_for('static', filename='hdf_icons/dataset.gif') }}";
+                        }
+                    }
+                    type = 'dataset';
+                }
+                var text = hfDict.hf_root_items[i][0];
+                text = text.split('/');
+                text = text[text.length - 1];
+                var node = $('#h5Tree').jstree().create_node(root_id, {
+                    text: text,
+                    icon: icon,
+                    //children: hf_root_items[i][3],                                               
+                    state: {
+                        opened: hfDict.hf_root_items[i][3],
+                        disabled: false,
+                        selected: false
+                    },
+                    a_attr: {
+                        "type": type,
+                        "obj_filepath": hfDict.filepath,
+                        "obj_path": hfDict.hf_root_items[i][0],
+                        "obj_attributes": hfDict.hf_root_items[i][2],
+                        "obj_dtype": hfDict.hf_root_items[i][4],
+                        "obj_dshape": hfDict.hf_root_items[i][5]
+                    }
+                }, "last");
+            }
+            showH5Files();
+        }
+
+        function populateH5Node(hfDict) {
+            console.log("populateH5Node");
+            // ad hf_new_items to selected node
+            var icon = '';
+            var type = '';
+            for (var i = 0; i <= hfDict.hf_new_items.length - 1; i++) {
+                if (hfDict.hf_new_items[i][1] == "group") {
+                    if (hfDict.hf_new_items[i][2].length >= 1) {
+                        icon = "{{ url_for('static', filename='hdf_icons/foldercloseA.gif') }}";
+                    } else {
+                        icon = "{{ url_for('static', filename='hdf_icons/folderclose.gif') }}";
+                    }
+                    type = 'group';
+                } else {
+                    if (hfDict.hf_new_items[i][4] == 'string') {
+                        icon = "{{ url_for('static', filename='hdf_icons/text.gif') }}";
+                    } else {
+                        if (hfDict.hf_new_items[i][2].length >= 1) {
+                            icon = "{{ url_for('static', filename='hdf_icons/datasetA.gif') }}";
+                        } else {
+                            icon = "{{ url_for('static', filename='hdf_icons/dataset.gif') }}";
+                        }
+                    }
+                    type = 'dataset';
+                }
+                var text = hfDict.hf_new_items[i][0];
+                text = text.split('/');
+                text = text[text.length - 1];
+                var node = $('#h5Tree').jstree().create_node(node_clicked.id, {
+                    text: text,
+                    icon: icon,
+                    //children: hf_root_items[i][3],                                               
+                    state: {
+                        opened: hfDict.hf_new_items[i][3],
+                        disabled: false,
+                        selected: false
+                    },
+                    a_attr: {
+                        "type": type,
+                        "obj_filepath": hfDict.filepath,
+                        "obj_path": hfDict.hf_new_items[i][0],
+                        "obj_attributes": hfDict.hf_new_items[i][2],
+                        "obj_dtype": hfDict.hf_new_items[i][4],
+                        "obj_dshape": hfDict.hf_new_items[i][5]
+                    }
+                }, "last");
+
+            }
+        }
+
+        // routine to refresh obj_attributes
+        function showObjAttributes(node) {
+            document.getElementById("hf_attributes").innerHTML = "";
+            close_file_button.style.display = "inline";
+            raw_button.style.display = "inline";
+            curve_button.style.display = "inline";
+            image_button.style.display = "inline";
+            // dataset name
+            var h5 = document.createElement("h5");
+            h5.innerText = node.text;
+            h5.style["fontWeight"] = "bold";
+            document.getElementById("hf_attributes").appendChild(h5);
+            var li = document.createElement("li");
+            li.innerText = node.a_attr.obj_dtype + ', ' + node.a_attr.obj_dshape;
+            document.getElementById("hf_attributes").appendChild(li);
+            for (var i = 0; i <= node.a_attr.obj_attributes.length - 1; i++) {
+                var li = document.createElement("li");
+                var key = document.createElement("a");
+                var sep = document.createElement("a");
+                var value = document.createElement("a");
+                key.innerText = node.a_attr.obj_attributes[i][0];
+                sep.innerHTML = " : ";
+                value.innerText = node.a_attr.obj_attributes[i][1];
+                li.appendChild(key);
+                li.appendChild(sep);
+                li.appendChild(value);
+                document.getElementById("hf_attributes").appendChild(li);
+            }
+            var shape = eval(node.a_attr.obj_dshape);
+            var obj_type = node.a_attr.type;
+
+            switch (shape.length) {
+                case 0:
+                    close_file_button.style.display = "none";
+                    curve_button.style.display = "none";
+                    image_button.style.display = "none";
+                    break;
+                case 1:
+                    close_file_button.style.display = "none";
+                    image_button.style.display = "none";
+                    break;
+                case 2:
+                    close_file_button.style.display = "none";
+                    break;
+                case 3:
+                    close_file_button.style.display = "none";
+                    curve_button.style.display = "none";
+                    break;
+                default:
+                    console.log("Object has no shape");
+                    if (obj_type === "file") {
+                        raw_button.style.display = "none";
+                        curve_button.style.display = "none";
+                        image_button.style.display = "none";
+                    }
+                    else {
+                        close_file_button.style.display = "none";
+                        raw_button.style.display = "none";
+                        curve_button.style.display = "none";
+                        image_button.style.display = "none";
+                    }
+            }
+        };
+
+        $(document).ready(function () {
+            // console.log("document.ready")
+
+            // Define elements to be resizable
+            $('#fileTreeSidebar').resizable({
+                handles: "e",
+                resize: function (event, ui) {
+                    var xPos = ui.size.width;
+                    H5FilesSidebar.style.marginLeft = xPos.toString() + "px";
+                    if (H5FilesSidebar.style.display == "none") {
+                        logoUserDiv.style.marginLeft = xPos.toString() + "px";
+                        tabsContent.style.marginLeft = xPos.toString() + "px";
+                        mainTabs.style.marginLeft = xPos.toString() + "px";
+                    }
+                    else {
+                        var xPos = parseInt(H5FilesSidebar.style.width.split("px")[0]) + ui.size.width;
+                        logoUserDiv.style.marginLeft = xPos.toString() + "px";
+                        tabsContent.style.marginLeft = xPos.toString() + "px";
+                        mainTabs.style.marginLeft = xPos.toString() + "px";
+                    }
+                }
+            });
+
+            $('#H5FilesSidebar').resizable({
+                handles: "e",
+                resize: function (event, ui) {
+                    if (fileTreeSidebar.style.display == "none") {
+                        var xPos = ui.size.width;
+                        logoUserDiv.style.marginLeft = xPos.toString() + "px";
+                        tabsContent.style.marginLeft = xPos.toString() + "px";
+                        mainTabs.style.marginLeft = xPos.toString() + "px";
+                    }
+                    else {
+                        var xPos = parseInt(fileTreeSidebar.style.width.split("px")[0]) + ui.size.width;
+                        logoUserDiv.style.marginLeft = xPos.toString() + "px";
+                        tabsContent.style.marginLeft = xPos.toString() + "px";
+                        mainTabs.style.marginLeft = xPos.toString() + "px";
+                    }
+                }
+            });
+
+            // Hide "about" message        
+            aboutCard.style.display = 'none';
+
+            // Set user name
+            userNameDiv = document.getElementById("userName");
+            userNameDiv.innerHTML = "  " + userName;
+
+            // Set vuo token/cookie for the Python API
+            vuoCookie = sanitizeCookie(cookies);
+            vuoCookieSpan.innerHTML = vuoCookie;
+
+            // Open File Browser side bar
+            showFileTree();
+
+            // Open initial tab with the Python REST API usage
+            openTab("001");
+            pythonApiTabContent.style.display = "none";
+            pythonApiTabButton.style.display = "none";
+
+            // Load jquery FileTree - Remote file browsing
+            $('#fileTree').fileTree({
+                root: rootDir,
+                script: "/sfiles/" + unixUserName,
+            },
+                function (file) {
+                    filepath = file;
+                    console.log("open h5 file: " + filepath);
+                    request('/loadH5File',
+                        {
+                            username: unixUserName,
+                            filepath: filepath
+                        },
+                        'POST')
+                }
+            );
+
+            // Load jquery jsTree - h5 files tree view
+            $('#h5Tree').jstree({
+                "core": {
+                    "check_callback": true,
+                    "multiple": false
+                },
+                "checkbox": {
+                    "visible": true
+                },
+                // "plugins": ["contextmenu"],
+                // "contextmenu": {
+                //     "items": jsTreeCustomMenu
+                // }
+            });
+
+            // Set action for every time a node is selected
+            $('#h5Tree').on("select_node.jstree", function (e, data) {
+                // pick selected node object           
+                node_clicked = $('#h5Tree').jstree(true).get_node(data.selected[0]);
+
+                // update h5path and dsetname span
+                h5pathSpan.innerHTML = node_clicked.a_attr.obj_filepath;
+                dsetnameSpan.innerHTML = node_clicked.a_attr.obj_path;
+
+                // display obj_attributes (HDF attributes)
+                showObjAttributes(node_clicked);
+
+                // expand node if it has children                  
+                if ((node_clicked.a_attr.type == "group") && (node_clicked.children.length == 0)) {
+                    request('/h5TreeUpdate',
+                        {
+                            username: unixUserName,
+                            filepath: node_clicked.a_attr.obj_filepath,
+                            node: node_clicked.a_attr.obj_path,
+                        },
+                        'POST');
+                }
+            })
+                .jstree();
+
+            // Close File button call/request
+            $('#close_file_button').on('click', function () {
+                console.log("Close File");
+                $('#h5Tree').jstree().delete_node(node_clicked); // remove node from h5Tree
+                request('/closeH5File',
+                    {
+                        username: unixUserName,
+                        filepath: node_clicked.a_attr.obj_filepath,
+                    },
+                    'POST')
+            });
+
+            // Create loading effect while processing data to plot
+            function blockUIPlot() {
+                $.blockUI({
+                    message: "<div class='loader'></div>",
+                    css: { border: 'none', backgroundColor: 'none', top: "50%", left: "50%" }
+                })
+            }
+
+            // Warning data is to large to be plotted 
+            function blockUILargeData(plotType, plotSize) {                
+                $.blockUI({
+                    message: "<div>Can't display " + plotType + " data of " + plotSize.toString() + " points." + "</div>",
+                })
+                setTimeout($.unblockUI, 2000);                    
+            }
+
+            // Calculate total number of points of dataset before plotting
+            function calculatePlotSize(shape) {
+                console.log(shape);
+                if (shape == "[]") {
+                    console.log("string data");
+                    return "string"
+                }   else {
+                    shape = eval(shape);
+                    var size = shape.reduce((a,b) => a * b);                
+                    return size
+                }             
+                
+            }
+
+            // Define plotting calls/requests
+            $('#raw_button').on('click', function () {
+                console.log('raw data');
+                var plotSize = calculatePlotSize(node_clicked.a_attr.obj_dshape);                
+                if (plotSize != "string" && plotSize > 1000000) {
+                    blockUILargeData("Raw", plotSize);
+                } else {
+                    request('/raw',
+                    {
+                        username: unixUserName,
+                        filepath: node_clicked.a_attr.obj_filepath,
+                        node: node_clicked.a_attr.obj_path,
+                    },
+                    'POST');                
+                    blockUIPlot(); // block page till request is completed
+                }                
+            });
+            $('#curve_button').on('click', function () {
+                console.log('curve data');
+                var plotSize = calculatePlotSize(node_clicked.a_attr.obj_dshape);
+                request('/curve',
+                    {
+                        username: unixUserName,
+                        filepath: node_clicked.a_attr.obj_filepath,
+                        node: node_clicked.a_attr.obj_path,
+                    },
+                    'POST');
+                blockUIPlot(); // block page till request is completed
+            });
+            $('#image_button').on('click', function () {
+                console.log('image data');
+                var plotSize = calculatePlotSize(node_clicked.a_attr.obj_dshape);
+                if (plotSize > 25000000) {
+                    blockUILargeData("Image", plotSize);
+                } else {
+                    request('/image',
+                    {
+                        username: unixUserName,
+                        filepath: node_clicked.a_attr.obj_filepath,
+                        node: node_clicked.a_attr.obj_path,
+                    },
+                    'POST');
+                    blockUIPlot(); // block page till request is completed 
+                }                
+            });
+
+            // About button action
+            $('#about_button').on('click', function () {
+                $.blockUI({ message: $('#about') });
+            });
+
+            // Logout call/request        
+            $('#logout_button').on('click', function () {
+                console.log("Logout");
+                var url = 'https://vuo.elettra.eu/pls/vuo/vlab.show_view_investigation?FRM_ID=' + investigationID;
+                w = window.open(url, "_self");
+                w.focus();
+            });
+
+            // If tab is closed calls /logout
+            $(window).on('beforeunload', function (e) {
+                // action before tab is closed
+            });
+
+        });        
+
+        function request(path, params, method) {
+
+            var form = document.createElement("form");
+            form.setAttribute("method", method);
+            form.setAttribute("action", path);
+
+            for (var key in params) {
+                if (params.hasOwnProperty(key)) {
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", key);
+                    hiddenField.setAttribute("value", params[key]);
+
+                    form.appendChild(hiddenField);
+                }
+            }
+
+            $.ajax({
+                url: path,
+                method: method,
+                data: $(form).serialize()
+            }).success(function (data, textStatus, jqXHR) {
+                if (path == '/loadH5File') {
+                    hfDict = JSON.parse(data);
+                    if (Object.keys(hfDict).length === 0) {
+                        console.log("File already opened!")
+                    } else {
+                        populateH5TreeRoot(hfDict);
+                    }
+                }
+                else if (path == '/h5TreeUpdate') {
+                    hfDict = JSON.parse(data);
+                    if (hfDict.hf_new_items[0] === "1") {
+                        console.log("Empty group");
+                    } else {
+                        populateH5Node(hfDict);
+                    }
+                }
+                else if (path == '/raw') {
+                    tabID = addTab(node_clicked.a_attr.obj_filepath.split('/').pop(),
+                        node_clicked.a_attr.obj_path
+                    );
+                    tabPlotID = "tab-plot-" + tabID;
+                    item = JSON.parse(data);
+                    Bokeh.embed.embed_item(item[0], tabPlotID);
+                    $.unblockUI();
+                }
+                else if (path == '/curve') {
+                    tabID = addTab(node_clicked.a_attr.obj_filepath.split('/').pop(),
+                        node_clicked.a_attr.obj_path
+                    );
+                    tabPlotID = "tab-plot-" + tabID;
+                    item = JSON.parse(data);
+                    Bokeh.embed.embed_item(item[0], tabPlotID);
+                    $.unblockUI();
+                }
+                else if (path == '/image') {
+                    tabID = addTab(node_clicked.a_attr.obj_filepath.split('/').pop(),
+                        node_clicked.a_attr.obj_path
+                    );
+                    tabPlotID = "tab-plot-" + tabID;
+                    item = JSON.parse(data);
+                    Bokeh.embed.embed_item(item[0], tabPlotID);
+                    $.unblockUI();
+                }
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.log(errorThrown);
+            });
+        };
+
+
+    </script>
+
+</body>
+
+</html>
