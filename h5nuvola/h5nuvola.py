@@ -49,10 +49,10 @@ from bokeh.core.properties import Dict
 with open('./h5nuvola.config') as json_config:
     config_dict = json.load(json_config)
 
-# VUO lab
+# VUO lab hash
 vlab_hash = str(config_dict.get("vlab_hash"))
 
-# https connection certificates
+# https connection certificates | ssl_context
 has_ssl_context = config_dict.get("has_ssl_context")
 locations_crt = str(config_dict.get("locations_crt"))
 users_nuvola_crt = str(config_dict.get("users_nuvola_crt"))
@@ -66,7 +66,7 @@ debug = config_dict.get("debug")
 # jQuery File Tree 
 fnfilter = lambda fn: True
 dfilter = lambda d: True
-extension_filter = ['.h5', '.hdf5'] # select desired file extensions to show
+extension_filter = ['.h5', '.hdf5'] # select desired file extensions to show | '*.*' for all extensions
 
 # h5 files manipulation
 hf_dict = {} # dictionary object to store h5 file object, items, attributes and properties
