@@ -46,17 +46,22 @@ from bokeh.core.properties import Dict
 #
 
 # Load config file
-with open('/opt/vuo-h5nuvola/h5nuvola/h5nuvola/h5nuvola.config') as json_config:
+with open('./h5nuvola.config') as json_config:
     config_dict = json.load(json_config)
 
 # VUO lab
 vlab_hash = str(config_dict.get("vlab_hash"))
 
 # https connection certificates
+has_ssl_context = config_dict.get("has_ssl_context")
 locations_crt = str(config_dict.get("locations_crt"))
 users_nuvola_crt = str(config_dict.get("users_nuvola_crt"))
 users_nuvola_key = str(config_dict.get("users_nuvola_key"))
 
+# Flask app.run configuration
+host = str(config_dict.get("host"))
+port = config_dict.get("port")
+debug = config_dict.get("debug")
 
 # jQuery File Tree 
 fnfilter = lambda fn: True
@@ -851,12 +856,12 @@ def h5data(filepath):
 #
 # Configure https/certificate | ssl_context
 #
+if has_ssl_context:
+    context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+    context.load_verify_locations(locations_crt)
+    context.load_cert_chain(users_nuvola_crt, users_nuvola_key)
+else:
+    context = None
 
-context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-# context.verify_mode = ssl.CERT_REQUIRED
-context.load_verify_locations(locations_crt)
-context.load_cert_chain(users_nuvola_crt, users_nuvola_key)
-# sslcontext = ("/root/certs/users-nuvola.elettra.eu.crt", "/root/certs/users-nuvola.elettra.eu.key")
 
-
-app.run(host='users-nuvola.elettra.eu', port=443, debug=True, ssl_context=context)
+app.run(host=host, port=port, debug=debug, ssl_context=context)
