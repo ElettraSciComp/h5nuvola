@@ -627,8 +627,11 @@ def sfiles(unix_user_name):
             r.append('<li class="file ext_%s">' \
             '<a href="#" rel="%s">%s</a></li>' % (e, ff, f))
         r.append('</ul>') 
+    
+    resp = Response(''.join(r))
+    # resp.headers['Access-Control-Allow-Origin'] = "*" 
 
-    return ''.join(r)
+    return resp
 
 # Load h5 files 
 @app.route('/loadH5File', methods=['POST']) 
