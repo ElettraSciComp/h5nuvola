@@ -776,6 +776,9 @@ def geth5dset_target( user_name, queue, h5fn,  dsetname, slicing='[:]' ):
     uid = pwd.getpwnam(user_name).pw_uid
     os.setuid(uid)
     try:
+        if ";" in slicing or "os" in slicing:
+            raise Exception("Injection detected")
+            
         exec( 'with h5.File(h5fn) as hf: d = hf[ dsetname ]%s'%slicing )   
 
         data = {'dbytes':d.tobytes(),
