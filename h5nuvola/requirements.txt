@@ -1,6 +1,6 @@
 # h5nuvola Python requirements
 
-numpy==1.13.0
+numpy==1.22.0
 h5py==2.7.1
 Flask==1.0.3
 bokeh==1.2.0
